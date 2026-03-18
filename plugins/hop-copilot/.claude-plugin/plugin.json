@@ -1,0 +1,18 @@
+{
+  "name": "hop-copilot",
+  "version": "1.0.0",
+  "description": "Head of Product automation — PO pulse checks, stakeholder updates, triage, capture, and memory system for product leadership oversight. Companion to endios-product-management-copilot.",
+  "author": {
+    "name": "Carlos Garcia",
+    "email": "carlos.garcia@endios.de"
+  },
+  "keywords": [
+    "head-of-product",
+    "product-leadership",
+    "po-oversight",
+    "pulse-check",
+    "stakeholder-updates",
+    "triage",
+    "endios"
+  ]
+}

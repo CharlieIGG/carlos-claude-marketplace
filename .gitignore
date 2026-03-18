@@ -1,0 +1,14 @@
+# Per-user state (created at runtime in workspace)
+.hop-copilot/
+memory/
+snapshots/
+config.json
+approvals.json
+backlog.json
+triage-log.json
+
+# OS
+.DS_Store
+
+# Dependencies
+node_modules/

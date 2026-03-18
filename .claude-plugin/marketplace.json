@@ -1,0 +1,13 @@
+{
+  "name": "carlos-claude-marketplace",
+  "owner": {
+    "name": "Carlos Garcia",
+    "email": "carlos.garcia@endios.de"
+  },
+  "plugins": [
+    {
+      "name": "hop-copilot",
+      "source": "./plugins/hop-copilot"
+    }
+  ]
+}
