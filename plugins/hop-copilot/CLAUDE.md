@@ -31,6 +31,8 @@ This plugin complements the product-management-copilot (which helps POs with ini
 - **Approval History:** `HoP/.hop-copilot/approvals.json`
 - **PO Snapshots:** `HoP/.hop-copilot/snapshots/{po_short_name}/{YYYY-MM-DD}.json` (last 3 per PO)
 - **PO Memory:** `HoP/.hop-copilot/memory/{po_short_name}.json` (persistent, no auto-expiry)
+- **Portfolio Snapshots:** `HoP/.hop-copilot/snapshots/portfolio/{YYYY-MM-DD}.json` (last 4)
+- **Portfolio Memory:** `HoP/.hop-copilot/memory/portfolio.json` (persistent, portfolio-level observations)
 
 ## Cross-Plugin References
 
@@ -43,8 +45,17 @@ This plugin complements `product-management-copilot`. It does NOT duplicate thos
 This plugin focuses on:
 - **Your personal productivity** (capture, backlog, self-improvement loop)
 - **Team oversight** (PO pulse checks with roadmap context, delivery tracking, nudging, persistent memory)
+- **Portfolio strategy** (portfolio-radar: cross-initiative overview, capacity conflicts, shipping pipeline, strategic balance)
 - **Stakeholder communication** (update drafts, reporting)
 - **Incoming request management** (triage, routing, logging)
+
+## Skill Interconnections
+
+Skills in this plugin are aware of each other and of PM-Copilot skills:
+- `portfolio-radar` suggests `pulse-check [PO]` when a risk traces to a PO, `stakeholder-update` when C-suite-watched items change, and PM-Copilot skills (`/assess`, `ticket-craft`, `concept-craft`) for initiative-level deep dives.
+- `pulse-check` suggests PM-Copilot skills in its AI tooling action cards when relevant to a PO's work.
+- `stakeholder-update` can suggest `portfolio-radar` if triggered without enough context ("run portfolio-radar first to gather the data").
+- PM-Copilot suggestions are only made when `endios-product-management-copilot` is installed. If unavailable, silently skip.
 
 ## PO Oversight Context
 

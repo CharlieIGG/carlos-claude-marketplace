@@ -1,5 +1,7 @@
 {
   "name": "carlos-claude-marketplace",
+  "version": "1.0.0",
+  "description": "Personal Claude Code plugin marketplace",
   "owner": {
     "name": "Carlos Garcia",
     "email": "carlos.garcia@endios.de"
@@ -7,7 +9,8 @@
   "plugins": [
     {
       "name": "hop-copilot",
-      "source": "./plugins/hop-copilot"
+      "source": "./plugins/hop-copilot",
+      "description": "Head of Product automation — PO pulse checks, stakeholder updates, triage, capture, and memory system for product leadership oversight."
     }
   ]
 }
