@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03-20",
+  "description": "Technical rules learned from production errors. Shared across all skills.",
+  "confluence": {
+    "adf_construction": [
+      "NEVER use {jira:KEY} shortcodes — they generate broken URLs pointing to your-instance.atlassian.net",
+      "Always build inlineCard nodes with explicit URLs: https://endios.atlassian.net/browse/PMPO-XXXX",
+      "Status lozenges: use ADF status nodes with color attribute (green, yellow, red, neutral). {status:text|color:X} shortcode renders incorrectly as grey/neutral.",
+      "Panel types: {warning}...{warning} shortcode creates panelType 'error' (red), not 'warning' (yellow). Use ADF panel node with explicit panelType."
+    ],
+    "delta_patch_tools": [
+      "confluence_update_table_cell with bulletList does NOT parse markdown bold (**text**). Use plaintext or build full ADF for rich formatting in table cells.",
+      "Inline links work in delta-patch tools.",
+      "Transient 401 errors can occur — retry once before failing."
+    ],
+    "table_formatting": {
+      "colwidth_total": 1238,
+      "default_colwidths": [203, 121, 774],
+      "layout": "center"
+    },
+    "page_references": {
+      "hod_report_parent": "3361472513",
+      "hod_report_space_id": "3350495235",
+      "hod_report_space_key": "EDH",
+      "component_database": "4923719682",
+      "component_ownership": "4397531168"
+    },
+    "iframe_embed": {
+      "jira_dashboard_id": "11135",
+      "maximized_gadget_id": "12588",
+      "note": "Use ADF extension node with extensionKey 'iframe' to embed Jira dashboards"
+    }
+  },
+  "jira": {
+    "api_version": "Use /rest/api/3/search/jql (v3), NOT v2 (deprecated)",
+    "display_name_rules": [
+      "Mo Zimmermann (not Moritz Zimmermann)",
+      "max.ohlig (lowercase)",
+      "sally.barth (lowercase)",
+      "Tiep Vu",
+      "Moritz Pirk"
+    ],
+    "jql_patterns": {
+      "active_initiatives": "project=PMPO AND type=Initiative AND status NOT IN (Done, Rejected, \"Roadmap Candidate\") ORDER BY rank ASC",
+      "finished_since": "project=PMPO AND type=Initiative AND status changed AFTER \"{date}\" AND status IN (Done, Rejected)",
+      "activated_since": "project=PMPO AND type=Initiative AND status changed AFTER \"{date}\" AND status WAS \"Roadmap Candidate\"",
+      "epic_health": "parent={INITIATIVE_KEY} AND type=Epic"
+    },
+    "or_clause_warning": "When using OR in JQL, always parenthesize each clause. OR without grouping searches ALL projects.",
+    "initiative_statuses": {
+      "active": ["Research", "Concept", "Pre-Development", "In Development", "Wrap-up & Release"],
+      "inactive": ["Roadmap Candidate", "Proposed", "Prioritized (Waiting)", "Ready for Prioritization"],
+      "terminal": ["Done", "Rejected"]
+    }
+  },
+  "smart_links": {
+    "base_url": "https://endios.atlassian.net/browse/",
+    "note": "All Jira smart links in ADF must use inlineCard nodes with this base URL + issue key"
+  },
+  "granola": {
+    "best_practice": "Use targeted query_granola_meetings with specific initiative/person questions instead of reading full transcripts. Full transcripts are 10-20KB each.",
+    "max_concurrent_queries": 3
+  }
+}

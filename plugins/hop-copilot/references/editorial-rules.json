@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03-20",
+  "description": "Terminology, voice, and output conventions. Shared across all skills.",
+  "terminology": {
+    "correct": {
+      "Feature Team": "The mobile development team. NEVER use 'agency', 'external team', or 'external partner'. They are NOT external.",
+      "Head of Department Report": "Full title for the biweekly HoD report. Use in Confluence page titles and headers.",
+      "Integrator": "Core technology platform. Not 'integrations'.",
+      "Product Owner": "POs at endios. Not 'product manager' unless referring to Igor (Project Manager).",
+      "Project Manager": "Igor Starcheus's role. Not 'team lead'. PMs carry multiple initiatives by design — do NOT flag as capacity conflict."
+    },
+    "people_roles": {
+      "Igor Starcheus": "Project Manager for the Feature Team. NOT team lead, NOT external.",
+      "Jonian": "Product Manager. NOT a developer."
+    },
+    "avoid_in_reports": [
+      "Individual developer names (except PO names when unavoidable)",
+      "Internal code-names in external-facing reports (check code_name_restricted flag)",
+      "Stale activity older than the reporting period without recent progress",
+      "Jira project key names as team names (e.g., 'AGENCY' instead of 'Feature Team')"
+    ]
+  },
+  "voice": {
+    "hod_report": {
+      "tone": "Narrative, collegial, balanced — peer-to-peer reporting to fellow Heads of Department",
+      "perspective": "Third person for initiatives, first person plural for team actions",
+      "avoid": ["status blaming", "finger-pointing", "overly optimistic language without evidence"]
+    },
+    "portfolio_radar": {
+      "tone": "Risk-first, direct, opinionated — chief of staff briefing",
+      "perspective": "Second person addressing Carlos"
+    },
+    "pulse_check": {
+      "tone": "Strategic, synthesis-focused, conversational — 1:1 prep",
+      "perspective": "Second person addressing Carlos"
+    },
+    "stakeholder_update": {
+      "tone": "Professional, concise, action-oriented — executive communication",
+      "perspective": "First person from Carlos"
+    }
+  },
+  "health_labels": {
+    "hod_report": {
+      "vocabulary": [
+        {"label": "good", "color": "green", "criteria": "On track, no blockers, progress matching plan"},
+        {"label": "good?", "color": "blue", "criteria": "Appears on track but unconfirmed aspects exist"},
+        {"label": "good, but...", "color": "green", "criteria": "Fundamentally OK with a notable caveat"},
+        {"label": "fluctuating", "color": "yellow", "criteria": "Mixed signals — some progress, some blockers/delays/uncertainty"},
+        {"label": "worsened", "color": "red", "criteria": "Regressed since last report — timeline slipped, new blocker emerged, progress stalled"},
+        {"label": "TBD", "color": "grey", "criteria": "Newly activated, insufficient data to assess"}
+      ],
+      "rule": "Use ONLY these labels. Never invent new ones. Always compare to previous report's label for the same initiative."
+    },
+    "portfolio_radar": {
+      "vocabulary": ["certain", "likely", "possible", "unlikely", "unknown"],
+      "note": "These are certainty labels, distinct from HoD health labels. Do not mix vocabularies."
+    }
+  },
+  "formatting": {
+    "smart_links": "Always use Jira smart links (inlineCard in ADF) for initiative references in Confluence. Format: PMPO-XXXX with link to https://endios.atlassian.net/browse/PMPO-XXXX",
+    "status_lozenges": "Use ADF status nodes for health labels and net change indicators. Map colors: good→green, fluctuating→yellow, worsened→red, TBD→grey",
+    "table_notes_column": "Use bullet points to separate different topics within the Notes column of highlights tables"
+  }
+}
