@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03-22",
+  "description": "Schedule parameters and calendar rules. Load on-demand during planning.",
+  "timezone": {
+    "iana": "Europe/Berlin",
+    "cet_offset": "+01:00",
+    "cest_offset": "+02:00",
+    "dst_rule": "Last Sunday of March → CEST; Last Sunday of October → CET",
+    "conversion_reminder": "ALWAYS convert Outlook UTC → Berlin. Double-check each event lands on the correct day and hour."
+  },
+  "business_hours": {
+    "start": "09:30",
+    "end": "18:00",
+    "lunch_start": "12:00",
+    "lunch_end": "13:00",
+    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+  },
+  "calendar_rules": {
+    "immovable": "Accepted and organizer events. Never schedule over them.",
+    "tentative": "Show with (tentative) marker. Can schedule tasks in the slot if needed, flagging conflict.",
+    "gtd_category": "Calendar events categorized as 'GTD' are previous time-blocks. Treat as available time — do NOT display as meetings.",
+    "buffer": "5-minute gaps between blocks for context switching."
+  },
+  "capacity": {
+    "target_utilization": 0.8,
+    "rule": "Fill ~80% of available time. Leave 20% buffer for overflow and context switching."
+  },
+  "task_nature_categories": [
+    {"name": "follow-ups", "keywords": ["follow up", "check in", "ping"], "typical_duration": "10-15min", "batching": "Group all follow-ups into one block"},
+    {"name": "meeting-prep", "keywords": ["prep", "review for", "prepare"], "typical_duration": "15-30min", "batching": "Place before the related meeting"},
+    {"name": "deep-work", "keywords": ["concept", "strategy", "business case", "phase definitions", "feedback"], "typical_duration": "60-90min", "batching": "Schedule in longest available blocks"},
+    {"name": "compliance", "keywords": ["GDPR", "DSK", "BFH", "NIS2", "AVV", "Datenschutz"], "typical_duration": "30-60min", "batching": "Batch all compliance into one slot"},
+    {"name": "reviews", "keywords": ["review", "check", "test", "timeline", "goals"], "typical_duration": "20-45min", "batching": "Combine similar reviews"},
+    {"name": "admin", "keywords": ["email", "catch up", "update to-do", "ratings pipeline"], "typical_duration": "10-20min", "batching": "End of day or gaps between meetings"}
+  ],
+  "meeting_task_matching": {
+    "rule": "Tasks tagged with a person name should surface as 💬 bring-up items ONLY during 1-on-1 meetings with that person. Never during large group meetings.",
+    "matching": "Match task tags (lowercase) against meeting attendee email prefixes (e.g., tag 'malte' → malte.kalkoffen@endios.de). Also match task title keywords against meeting subject.",
+    "skipped_1on1": "If a 1-on-1 is skipped, use AskUserQuestion to ask about EACH tagged task individually — defer to next week, handle async, or bring up in a different meeting."
+  }
+}
