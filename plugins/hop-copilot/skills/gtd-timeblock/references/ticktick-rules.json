@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03-22",
+  "description": "TickTick API patterns learned from production use. Load on-demand during write operations.",
+  "project_ids": {
+    "work": "68b087d73ae1511029d2bcc0",
+    "inbox": "inbox"
+  },
+  "api_behavior": {
+    "timestamps": "TickTick returns +0000 (UTC). The timeZone field indicates the user's intended local zone. Always convert UTC → Berlin before displaying.",
+    "batch_update": "Use batch_update_tasks for 3+ updates. Returns id2etag (success) and id2error (failures). Zero errors = all persisted.",
+    "complete_recurring": "complete_task on a recurring task advances to next occurrence — it does NOT delete the task. The returned task shows the next due date.",
+    "point_tasks": "Set startDate == dueDate for tasks without duration. This avoids rendering duration bars that visually overlap calendar events.",
+    "duration_tasks": "Set startDate < dueDate only when the task genuinely occupies a time range (e.g., deep work blocks).",
+    "recurring_tasks_warning": "Do NOT move recurring tasks (Catch up Email, Update To-Do list, review timeline). Changing startDate/dueDate affects ALL future recurrences. Leave them at their original times.",
+    "sync_delay": "Writes via API may take 30-60s to appear in TickTick desktop/mobile apps. Creates sync faster than updates.",
+    "tag_matching": "Tags are lowercase strings. Use tags to match tasks to meeting attendees (e.g., tag 'malte' → attendee malte.kalkoffen@endios.de)."
+  },
+  "priority_map": {
+    "0": "none",
+    "1": "low",
+    "3": "medium",
+    "5": "high"
+  },
+  "personal_task_filters": [
+    "Einbürgerung", "therapy", "Terapia", "Sebastian", "grocery", "journal",
+    "emociones", "wedding", "Revista", "Driver's License", "Plants", "Balcony",
+    "Prep Lunch", "5m Journal", "personal"
+  ],
+  "ai_task_filters": [
+    "AI Task [IMPORTANT_ALERT]", "AI Task:"
+  ],
+  "write_verification": "After batch_update_tasks, wait for user confirmation that changes are visible in TickTick before proceeding. API success does NOT guarantee immediate client sync."
+}
