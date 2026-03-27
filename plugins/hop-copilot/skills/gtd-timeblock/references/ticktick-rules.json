@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "last_updated": "2026-03-22",
+  "version": "1.2",
+  "last_updated": "2026-03-27",
   "description": "TickTick API patterns learned from production use. Load on-demand during write operations.",
   "project_ids": {
     "work": "68b087d73ae1511029d2bcc0",
@@ -10,8 +10,12 @@
     "timestamps": "TickTick returns +0000 (UTC). The timeZone field indicates the user's intended local zone. Always convert UTC → Berlin before displaying.",
     "batch_update": "Use batch_update_tasks for 3+ updates. Returns id2etag (success) and id2error (failures). Zero errors = all persisted.",
     "complete_recurring": "complete_task on a recurring task advances to next occurrence — it does NOT delete the task. The returned task shows the next due date.",
-    "point_tasks": "Set startDate == dueDate for tasks without duration. This avoids rendering duration bars that visually overlap calendar events.",
-    "duration_tasks": "Set startDate < dueDate only when the task genuinely occupies a time range (e.g., deep work blocks).",
+    "task_duration_mandatory": "EVERY task MUST have a duration. startDate = when the task starts, dueDate = when it ends, difference = actual effort that blocks time on the calendar. TickTick renders this as a time block in the timeline view. A 15-min follow-up = 15 min. A 75-min deep work session = 75 min. Refer to schedule-params.json task_nature_categories for typical durations per task type.",
+    "never_zero_duration": "NEVER set startDate == dueDate (zero-duration 'point tasks'). These appear as dots on the timeline and block no time. Carlos's workflow relies on seeing how long each task will take.",
+    "never_all_day": "NEVER set isAllDay: true. All-day tasks float at the top of the day with no time slot — Carlos will never catch them. Every task must have a concrete clock time with isAllDay: false.",
+    "same_day_only": "Duration MUST stay within the same calendar day. NEVER create multi-day tasks (e.g., startDate on Tuesday, dueDate on Thursday). If work spans multiple sessions across days, create a separate task for each session with its own realistic duration.",
+    "duration_limits": "Duration MUST be realistic for the task's nature. Hard limits by category (from schedule-params.json task_nature_categories): follow-ups ≤ 15min, meeting-prep ≤ 30min, deep-work ≤ 90min, compliance ≤ 60min, reviews ≤ 45min, admin ≤ 20min. ABSOLUTE MAXIMUM for any single task = 120 minutes. If you compute a duration > 120min, STOP — you have a bug. A 'send update' email is 10-15min, not 7 hours. Before every write, sanity-check: does this duration match what a human would actually spend? If not, recalculate.",
+    "deadline_metadata": "Tasks may have a deadline line in the content (description) field, formatted as: 'deadline: YYYY-MM-DD [HH:MM] | reason'. When WRITING to TickTick: (1) Append the deadline line after existing description content, preceded by a blank line. NEVER overwrite existing text. (2) If the description is empty, the deadline line is the only content. (3) NEVER add deadline metadata to recurring tasks. (4) Dates are in Europe/Berlin local time, not UTC. When READING from TickTick: (1) Check if the last line of content starts with 'deadline:'. (2) If present, parse the date and reason. (3) If absent, the task has no deadline constraint — treat as fully movable. (4) If the line was manually deleted by Carlos, re-infer on the next planning cycle using schedule-params.json deadline_inference patterns.",
     "recurring_tasks_warning": "Do NOT move recurring tasks (Catch up Email, Update To-Do list, review timeline). Changing startDate/dueDate affects ALL future recurrences. Leave them at their original times.",
     "sync_delay": "Writes via API may take 30-60s to appear in TickTick desktop/mobile apps. Creates sync faster than updates.",
     "tag_matching": "Tags are lowercase strings. Use tags to match tasks to meeting attendees (e.g., tag 'malte' → attendee malte.kalkoffen@endios.de)."

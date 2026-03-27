@@ -96,6 +96,25 @@ Save to a triage log for weekly review. Add an entry to `HoP/.hop-copilot/triage
 - "Should I create a Jira ticket for this?"
 - "Want me to add a follow-up reminder for [date]?"
 
+**If creating a TickTick task from a triaged request:**
+Infer deadline metadata using the gtd-timeblock `schedule-params.json deadline_inference` patterns:
+- `urgent_important` category → set deadline based on stated deadline or default 2 weekdays
+- `important_not_urgent` → set deadline from context, or leave blank if no constraint
+- `urgent_not_important` → set deadline = end of week (courtesy acknowledgment)
+- `neither` → no TickTick task needed
+
+When writing the task to TickTick, follow `ticktick-rules.json deadline_metadata` rules:
+append `deadline: YYYY-MM-DD | reason` to the task description. Include the requester and
+source as context in the reason (e.g., `deadline: 2026-04-01 | Malte request via Teams`).
+
+Also log the inferred deadline in the triage-log.json entry:
+```json
+{
+  "deadline_inferred": "2026-04-01",
+  "deadline_source": "executive_request pattern"
+}
+```
+
 ## Mode 2: Review Incoming Requests
 
 When Carlos asks to review pending requests:
