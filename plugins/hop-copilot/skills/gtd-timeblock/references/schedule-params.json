@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "last_updated": "2026-03-22",
+  "version": "1.2",
+  "last_updated": "2026-03-27",
   "description": "Schedule parameters and calendar rules. Load on-demand during planning.",
   "timezone": {
     "iana": "Europe/Berlin",
@@ -34,6 +34,99 @@
     {"name": "reviews", "keywords": ["review", "check", "test", "timeline", "goals"], "typical_duration": "20-45min", "batching": "Combine similar reviews"},
     {"name": "admin", "keywords": ["email", "catch up", "update to-do", "ratings pipeline"], "typical_duration": "10-20min", "batching": "End of day or gaps between meetings"}
   ],
+  "scheduling_discipline": {
+    "step_1_map_calendar": "BEFORE placing any tasks, fetch the full Outlook calendar for the target date range. Identify all immovable events (accepted meetings, organizer meetings). Mark available windows.",
+    "step_2_compute_windows": "Subtract immovable events and lunch from business hours. The result is the set of available windows. Each window has a start time, end time, and duration in minutes.",
+    "step_3_place_sequentially": "Place tasks one by one into available windows. Each task's startDate must equal or follow the previous task's dueDate. Never overlap tasks with each other or with calendar events.",
+    "step_4_respect_buffers": "Leave 5-minute gaps between tasks for context switching (per calendar_rules.buffer). Exception: batched follow-ups can be placed back-to-back.",
+    "step_5_verify_no_overlaps": "After placing all tasks, scan the full schedule for overlaps: task-vs-task and task-vs-calendar-event. If any overlap exists, shift the conflicting task to the next available slot."
+  },
+  "deadline_inference": {
+    "description": "Rules for automatically inferring deadline metadata when creating or scheduling tasks. Applied at Step 3.5 (planning) and Mode 3 (task creation). Inference produces a single line: deadline: YYYY-MM-DD [HH:MM] | reason. See deadline-config.json for format details.",
+    "patterns": [
+      {
+        "id": "meeting_prep",
+        "trigger": "Task title contains prep-like keywords AND task is tagged with a person name that matches a calendar event attendee",
+        "keywords": ["prep", "review for", "prepare for", "vorbereiten"],
+        "logic": "Look up the next calendar event with the tagged person. Set deadline = event start time. Reason = meeting name.",
+        "example_input": "Prep roadmap review (tag: malte) + Outlook shows 'Jourfixe MK <> CG' on Mon 15:00",
+        "example_output": "deadline: 2026-03-31 15:00 | Jourfixe MK <> CG",
+        "certainty": "high"
+      },
+      {
+        "id": "1on1_discussion_item",
+        "trigger": "Task tagged with a person name and the next 1-on-1 with that person exists on the calendar",
+        "keywords": [],
+        "logic": "Resolve the next 1-on-1 meeting with the tagged person from Outlook. Set deadline = meeting start time. Reason = meeting name. This captures bring-up items that should happen before/during the 1:1.",
+        "example_input": "Discuss analytics exposé (tag: mo) + Outlook shows 'Mo <> Carlos' on Tue 10:00",
+        "example_output": "deadline: 2026-04-01 10:00 | Mo <> Carlos",
+        "certainty": "high"
+      },
+      {
+        "id": "code_freeze_release",
+        "trigger": "Task title or context mentions code freeze, release, deployment, or a specific initiative with a known deadline",
+        "keywords": ["code freeze", "release", "deploy", "go-live", "launch"],
+        "logic": "Extract the deadline date from context (conversation, Jira initiative, or stated by Carlos). Set deadline = that date. Reason = event name.",
+        "example_input": "Sally's BPW tickets before code freeze (context: Apr 20 code freeze)",
+        "example_output": "deadline: 2026-04-20 | BPW code freeze",
+        "certainty": "high"
+      },
+      {
+        "id": "compliance_regulatory",
+        "trigger": "Task involves GDPR, NIS2, DPIA, AVV, DSK, Datenschutz, or other compliance keywords",
+        "keywords": ["GDPR", "DSGVO", "NIS2", "DPIA", "AVV", "DSK", "Datenschutz", "compliance", "Einwilligung"],
+        "logic": "Compliance tasks have real legal deadlines. If Carlos states a deadline, use it. If not, ask — do NOT guess. Compliance deadlines should never be inferred silently.",
+        "example_input": "DPIA for new push notification feature (Carlos says: needs to be done before next sprint)",
+        "example_output": "deadline: 2026-04-07 | DPIA before sprint start",
+        "certainty": "medium — only if Carlos stated the date"
+      },
+      {
+        "id": "follow_up_courtesy",
+        "trigger": "Task is a follow-up email, ping, or check-in with no hard external constraint",
+        "keywords": ["follow up", "check in", "ping", "remind", "nudge", "ask about"],
+        "logic": "Social follow-ups have a soft courtesy window. Default: 2 weekdays from now. Reason = 'follow-up courtesy'. This is the softest deadline — freely movable.",
+        "example_input": "Follow up with Mo about analytics",
+        "example_output": "deadline: 2026-04-01 | follow-up courtesy",
+        "certainty": "low"
+      },
+      {
+        "id": "explicit_date_stated",
+        "trigger": "Carlos explicitly states a deadline in conversation ('by Friday', 'before Tuesday', 'needs to happen by April 3')",
+        "keywords": [],
+        "logic": "Parse the explicit date. Convert relative references ('by Friday', 'next week') to absolute dates. Reason = Carlos's stated context.",
+        "example_input": "I need Timo's onboarding task created before Tuesday the 7th",
+        "example_output": "deadline: 2026-04-07 | Timo onboarding start",
+        "certainty": "high"
+      },
+      {
+        "id": "executive_request",
+        "trigger": "Task originates from CTO (Malte), CEO, or other executive with implicit urgency",
+        "keywords": ["Malte asked", "CTO wants", "exec request", "leadership"],
+        "logic": "Executive requests default to 2 weekdays unless explicitly stated otherwise. Reason = requester.",
+        "example_input": "Malte wants an update on NIS2 readiness",
+        "example_output": "deadline: 2026-04-01 | Malte request",
+        "certainty": "medium"
+      },
+      {
+        "id": "no_inferable_deadline",
+        "trigger": "No keywords match, no person tag with upcoming meeting, no explicit date, no context clues",
+        "keywords": [],
+        "logic": "Do NOT invent a deadline. Leave the task description without a deadline line. Task becomes 'unanchored' — most movable during rebalancing.",
+        "example_input": "Brainstorm growth strategy for Q3",
+        "example_output": "(no deadline line)",
+        "certainty": "n/a"
+      }
+    ],
+    "inference_rules": [
+      "Apply patterns in order from most specific to least specific. First match wins.",
+      "Pattern priority: explicit_date_stated > meeting_prep > 1on1_discussion_item > code_freeze_release > compliance_regulatory > executive_request > follow_up_courtesy > no_inferable_deadline.",
+      "If certainty is 'low' or 'medium', show the inferred deadline in the triage/plan table so Carlos can override before writing to TickTick.",
+      "If a task matches multiple patterns, use the one with the earliest deadline (most constraining).",
+      "Calendar lookups for meeting anchoring use the Outlook data already fetched in Step 1. No extra API calls.",
+      "When resolving person tags to meetings, use the meeting_task_matching rules from this file.",
+      "NEVER infer deadlines for recurring tasks."
+    ]
+  },
   "meeting_task_matching": {
     "rule": "Tasks tagged with a person name should surface as 💬 bring-up items ONLY during 1-on-1 meetings with that person. Never during large group meetings.",
     "matching": "Match task tags (lowercase) against meeting attendee email prefixes (e.g., tag 'malte' → malte.kalkoffen@endios.de). Also match task title keywords against meeting subject.",

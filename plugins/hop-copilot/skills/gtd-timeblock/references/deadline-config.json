@@ -1,0 +1,85 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03-27",
+  "description": "Deadline and negotiability configuration. Controls how the skill infers deadlines, computes negotiability from weekday gaps, and escalates overdue tasks. Load on-demand during planning (Step 3.5) and rebalancing (Mode 2).",
+
+  "metadata_format": {
+    "field_name": "deadline",
+    "location": "Last line of TickTick task content (description) field",
+    "format": "deadline: YYYY-MM-DD [HH:MM] | reason",
+    "examples": [
+      "deadline: 2026-04-20 | BPW code freeze",
+      "deadline: 2026-03-31 15:00 | Malte 1:1",
+      "deadline: 2026-04-03 | follow-up courtesy"
+    ],
+    "rules": [
+      "Append after existing description content, preceded by a blank line. Never overwrite existing text.",
+      "If description is empty, the deadline line is the only content.",
+      "The reason after | is human-readable — Carlos should understand why this date matters at a glance.",
+      "If a task has no inferable deadline, leave the description clean. No deadline line = fully movable.",
+      "NEVER add deadline metadata to recurring tasks (they affect all future occurrences).",
+      "Time component (HH:MM) is optional. Use it only for meeting-anchored tasks where the specific time matters.",
+      "Date and time are always in Europe/Berlin local time, NOT UTC."
+    ]
+  },
+
+  "gap_computation": {
+    "unit": "weekdays",
+    "rule": "gap = count_weekdays(today, deadline). Weekdays = Mon–Fri only. Weekends and the current day are excluded from the count. Example: Friday → Monday = 1 weekday. Friday → Friday next week = 5 weekdays. Thursday → Monday = 1 weekday.",
+    "examples": [
+      {"today": "Friday Mar 27", "deadline": "Monday Mar 30", "gap": 1},
+      {"today": "Friday Mar 27", "deadline": "Wednesday Apr 1", "gap": 3},
+      {"today": "Friday Mar 27", "deadline": "Friday Apr 3", "gap": 5},
+      {"today": "Monday Mar 30", "deadline": "Monday Mar 30", "gap": 0},
+      {"today": "Monday Mar 30", "deadline": "Tuesday Mar 31", "gap": 1},
+      {"today": "Wednesday Apr 1", "deadline": "Monday Apr 6", "gap": 3}
+    ]
+  },
+
+  "negotiability_thresholds": {
+    "description": "Negotiability is computed dynamically from the weekday gap. Never stored as a static label.",
+    "levels": [
+      {
+        "gap": ">5 weekdays",
+        "label": "freely_movable",
+        "rebalance_behavior": "Defer without asking Carlos. First candidates for displacement when something urgent lands."
+      },
+      {
+        "gap": "3–5 weekdays",
+        "label": "movable_flagged",
+        "rebalance_behavior": "Can move, but flag in the rebalance plan: '⚠️ getting close to deadline'. Carlos sees it but doesn't need to approve."
+      },
+      {
+        "gap": "1–2 weekdays",
+        "label": "resist_moving",
+        "rebalance_behavior": "Ask Carlos before moving. Show the deadline and reason: 'This is due [date] for [reason]. Still okay to push?' Never auto-defer."
+      },
+      {
+        "gap": "0 (today)",
+        "label": "immovable",
+        "rebalance_behavior": "Never defer. If it can't fit today, escalate: 'This is due today — what should give way?'"
+      },
+      {
+        "gap": "<0 (overdue)",
+        "label": "overdue",
+        "rebalance_behavior": "Flag with quick-resolve prompt (see overdue_escalation)."
+      }
+    ],
+    "no_deadline": {
+      "label": "unanchored",
+      "rebalance_behavior": "Most movable pool. Deferred first during rebalancing. TickTick priority determines order within this pool (HIGH deferred last, NONE deferred first)."
+    }
+  },
+
+  "overdue_escalation": {
+    "trigger": "Task has a deadline line and gap < 0 (deadline date has passed)",
+    "behavior": "Surface once per planning cycle with a quick-resolve prompt via AskUserQuestion",
+    "prompt_template": "⏰ OVERDUE: '{task_title}' was due {deadline_date} ({abs_gap} weekdays ago) for: {reason}",
+    "options": [
+      "New deadline: [suggest next reasonable date]",
+      "Do it today",
+      "Drop it (mark complete / remove deadline)"
+    ],
+    "after_resolution": "Update the deadline line in the task description with the new date, or remove it if dropped. Do not re-flag until the new deadline is also overdue."
+  }
+}
