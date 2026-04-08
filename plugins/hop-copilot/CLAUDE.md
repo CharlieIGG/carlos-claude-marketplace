@@ -9,6 +9,10 @@ This plugin complements the product-management-copilot (which helps POs with ini
 
 **"Quick capture, continuous improvement."** Anytime you notice a repetitive task or pain point, capture it. The backlog grows organically and becomes your personal automation roadmap.
 
+## Automation Opportunity Detection
+
+When Carlos explicitly mentions a repetitive task, pain point, or manual process, you may offer to log it to the automation backlog. Do NOT evaluate this after every response — only react when the mention is obvious and direct. Never append meta-commentary about whether the condition was met.
+
 ## State Storage
 
 - **Local state:** `HoP/.hop-copilot/` directory (config, backlog, approvals, snapshots, memory)
