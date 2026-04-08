@@ -12,17 +12,6 @@
         ]
       }
     ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "After your response, briefly check: did Carlos mention a repetitive task, a pain point, a manual process, or something he wishes were automated — even in passing? If YES, gently offer: 'That sounds like something worth capturing in your automation backlog. Want me to log it?' Keep it to one sentence. If NO, say nothing extra.",
-            "timeout": 15
-          }
-        ]
-      }
-    ]
+    "Stop": []
   }
 }
